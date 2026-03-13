@@ -1,0 +1,9 @@
+Dumpear o leer:
+
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 921600 read_flash 0 ALL backup_full.bin
+
+
+
+Flashear o escribir:
+
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 921600 write_flash 0x0 backup_full.bin

@@ -1,0 +1,4 @@
+Llamar al .ino Descargas.ino y ponerlo en Descargas
+
+arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=huge_app Descargas.ino && \
+arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32:PartitionScheme=huge_app Descargas.ino
