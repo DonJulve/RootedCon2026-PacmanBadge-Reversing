@@ -20,8 +20,8 @@
 #define _down GPIO_NUM_27
 #define _select GPIO_NUM_14
 #define _start GPIO_NUM_32
-#define _a GPIO_NUM_33  // Asignado por defecto (no especificado por el usuario)
-#define _b GPIO_NUM_13  // Asignado a 14 porque el 35 no tiene pull-up interno
+#define _a GPIO_NUM_33
+#define _b GPIO_NUM_13
 
 Arduino_DataBus *bus = new Arduino_ESP32SPI(_dc, _cs, _sclk, _mosi, _miso);
 Arduino_GFX *tft = new Arduino_ST7735(bus, _rst, 3 /* rotation */, false /* IPS */, 128, 160, 0, 0, 0, 0, true /* bgr */);
@@ -110,8 +110,8 @@ int sdl_update(void) {
   static bool rotation_triggered = false;
   static uint8_t current_rotation = 3;
 
-  // Rotar pantalla si se mantienen UP+DOWN+LEFT+RIGHT+A+B durante 3 segundos
-  if (button_up && button_down && button_left && button_right && button_a && button_b) {
+  // Rotar pantalla si se mantienen LEFT+RIGHT+A+B durante 3 segundos
+  if (button_left && button_right && button_a && button_b) {
     if (rotation_hold_start == 0) {
       rotation_hold_start = millis();
     } else if (!rotation_triggered && (millis() - rotation_hold_start >= 3000)) {

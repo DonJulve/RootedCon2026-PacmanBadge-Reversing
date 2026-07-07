@@ -99,7 +99,7 @@ Dado que la placa de la RootedCon carece de algunos botones dedicados que tendr√
 - **Start / Select**: Como faltan botones f√≠sicos en la placa, usa estas combinaciones:
   - Presiona a la vez **A + B + UP (Arriba)** para pulsar *Start*.
   - Presiona a la vez **A + B + DOWN (Abajo)** para pulsar *Select*.
-- **Rotar Pantalla (Modo Demo / Jugar)**: Puedes girar la pantalla 180 grados en cualquier momento (ideal para llevar la placa colgando del cuello y luego girarla para jugar). Solo tienes que **mantener pulsados a la vez los 4 botones de la cruceta + A + B durante 3 segundos**.
+- **Rotar Pantalla (Modo Demo / Jugar)**: Puedes girar la pantalla 180 grados en cualquier momento (ideal para llevar la placa colgando del cuello y luego girarla para jugar). Solo tienes que **mantener pulsados a la vez los botones Izquierda + Derecha + A + B durante 3 segundos**.
 
 ### Flasheo de Marauder
 Utiliza el script documentado en `flash_marauder.txt` o mediante `arduino-cli`:
