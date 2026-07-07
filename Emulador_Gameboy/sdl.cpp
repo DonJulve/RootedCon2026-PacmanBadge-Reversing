@@ -110,6 +110,12 @@ int sdl_update(void) {
   static bool rotation_triggered = false;
   static uint8_t current_rotation = 3;
 
+  if (current_rotation == 3) {
+    int temp = button_a; button_a = button_b; button_b = temp;
+    temp = button_left; button_left = button_right; button_right = temp;
+    temp = button_up; button_up = button_down; button_down = temp;
+  }
+
   // Rotar pantalla si se mantienen LEFT+RIGHT+A+B durante 3 segundos
   if (button_left && button_right && button_a && button_b) {
     if (rotation_hold_start == 0) {
