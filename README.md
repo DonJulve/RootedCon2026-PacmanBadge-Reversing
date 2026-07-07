@@ -5,7 +5,7 @@ Este repositorio contiene todo el trabajo de ingeniería inversa, modificación 
 ![Pacman Badge Project](https://img.shields.io/badge/RootedCon-2026-yellow?style=for-the-badge)
 ![Platform](https://img.shields.io/badge/Platform-ESP32-blue?style=for-the-badge)
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 El proyecto está dividido en varios componentes clave que cubren desde el hardware original hasta el desarrollo de firmware personalizado:
 
@@ -19,6 +19,11 @@ Convierte tu badge en una **consola arcade portátil**.
 Implementación propia de **ESP32 Marauder** adaptada específicamente para este hardware.
 - Versiones disponibles para **Marauder 1.0** y **Marauder 2.0**.
 - Capacidades de auditoría WiFi y Bluetooth directamente en el badge.
+
+### Mando del Robot
+Controlador para el evento de pelea de robots de la RootedCon.
+- Utiliza la badge como un mando a distancia por WiFi UDP para controlar los motores y servos.
+- Código fuente disponible en la carpeta `Mando robot`.
 
 ### Emulador Gameboy
 Port completo de un emulador de Gameboy para el hardware específico de la RootedCon.
@@ -63,6 +68,17 @@ Para cargar el sistema arcade:
 2. Configura la placa como **ESP32 Dev Module**.
 3. Asegúrate de tener instaladas las librerías necesarias (TFT_eSPI, etc.).
 4. Flashea directamente a la placa.
+
+### Mando del Robot
+Para controlar un robot en la pelea de robots del evento, es necesario configurar las credenciales correctas para conectarse a tu robot:
+1. Abre el archivo `Mando robot/Mando_robot.ino` en el IDE de Arduino.
+2. Localiza las variables de configuración de red (alrededor de la línea 15):
+   ```cpp
+   const char* ssid = "Capibot";     
+   const char* password = "capibotcapibot";    
+   ```
+3. Cambia el `ssid` y `password` por las credenciales WiFi específicas de tu robot.
+4. Flashea el código a tu badge. Utiliza los botones direccionales para moverte y los botones Start/Select virtuales para las acciones del servo.
 
 ### Emulador de Gameboy
 Para jugar a juegos de Gameboy en la placa, sigue estos pasos detallados:
@@ -110,7 +126,7 @@ arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32:PartitionScheme=huge
 
 ---
 
-## 🛠️ Especificaciones Técnicas
+## Especificaciones Técnicas
 - **MCU**: ESP32 (WROOM module).
 - **Pantalla**: TFT Color (Librería configurada en `User_Setup.h`).
 - **Input**: Botones físicos mapeados en la carpeta de descubrimiento de pines (Teniendo en cuenta que es poniendo la badge boca abajo).
