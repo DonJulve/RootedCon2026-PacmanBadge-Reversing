@@ -88,8 +88,8 @@ Debido a que la ROM del juego se incrusta directamente en el código del program
 
 **Opción B: Desde línea de comandos (`arduino-cli`)**
 ```bash
-arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=huge_app esp32-gameboy.ino
-arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32:PartitionScheme=huge_app esp32-gameboy.ino
+arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=huge_app Emulador_Gameboy.ino
+arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32:PartitionScheme=huge_app Emulador_Gameboy.ino
 ```
 
 #### 3. Controles en la Badge
