@@ -2,13 +2,15 @@
 #include <stdio.h>
 
 #include "cpu.h"
-#include "gbrom.h"
 #include "lcd.h"
 #include "mem.h"
 #include "rom.h"
-#include "sd.h"
 #include "sdl.h"
 #include "timer.h"
+#include <LittleFS.h>
+#include "ui.h"
+#include "flash_mmap.h"
+
 
 static constexpr uint32_t emulator_cpu_freq = 4200000 / 4;
 static constexpr uint32_t frames_per_sec = 60;
@@ -17,10 +19,29 @@ static uint32_t cycles_per_frame = 0;
 static uint32_t cycles_in_micro_sec = 0;
 
 void setup() {
-  int r = rom_init(gb_rom);
+  Serial.begin(115200);
+  if (!LittleFS.begin(true)) {
+      Serial.println("LittleFS mount failed");
+  }
 
   sdl_init();
-  // sd_init(); // DESACTIVADO: Entra en conflicto con TFT_DC (pin 16)
+
+  UI ui(tft);
+  const char* gamePath = ui.selectGame();
+  
+  const unsigned char* rom_ptr = nullptr;
+  if (gamePath != nullptr) {
+      rom_ptr = mappedROM_init(gamePath);
+  }
+  
+  if (rom_ptr == nullptr) {
+      Serial.println("Error: No ROM selected or mapping failed. Halting.");
+      while(true) delay(100);
+  }
+
+  int r = rom_init(rom_ptr);
+
+  sdl_start_draw_task();
 
   gameboy_mem_init();
 

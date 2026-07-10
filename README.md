@@ -26,11 +26,12 @@ Controlador para el evento de pelea de robots de la RootedCon.
 - Código fuente disponible en la carpeta `Mando robot`.
 
 ### Emulador Gameboy
-Port completo de un emulador de Gameboy para el hardware específico de la RootedCon.
+Port completo de un emulador de Gameboy para el hardware específico de la RootedCon. Incorpora un **menú multijuegos impulsado por LittleFS** y carga ultrarrápida mediante **Memory Mapping** nativo.
 - Basado en el excelente proyecto [esp32-gameboy](https://github.com/lualiliu/esp32-gameboy) de **lualiliu**.
 - Configuración de pines adaptada al D-pad y botones de la placa.
 - Pantalla rotada 180 grados y corrección de colores para el driver ST7735/ST7789 configurada.
 - Arreglo de pull-ups internos para los botones y combinación de botones virtuales (el botón *Start* se activa pulsando *A + B + UP* a la vez, y *Select* con *A + B + DOWN* debido a la limitación de botones físicos).
+- Menú de selección interactivo en el que alojar varias ROMs sin necesidad de recompilar.
 
 ### Preguntas
 Análisis y hackeo del sistema original de desafíos del evento.
@@ -83,39 +84,40 @@ Para controlar un robot en la pelea de robots del evento, es necesario configura
 ### Emulador de Gameboy
 Para jugar a juegos de Gameboy en la placa, sigue estos pasos detallados:
 
-#### 1. Preparar la ROM del juego
-1. Navega a la carpeta `esp32-gameboy`.
-2. Consigue una ROM original de Gameboy Clásica (extensión `.gb`). *(Nota: Este emulador no es compatible con juegos de Gameboy Color `.gbc` ni Gameboy Advance `.gba`)*.
-3. Convierte el archivo `.gb` a un archivo de cabecera de C (`gbrom.h`) que el ESP32 pueda compilar junto al código. Para ello, usa el script de Python proporcionado:
-   ```bash
-   # Sintaxis: python3 ./bin2h.py -b <path to your GD ROM you downloaded> -c gbrom.h -v gb_rom
-   python3 ./bin2h.py -b "Kirby's_Dream_Land.gb" -c gbrom.h -v gb_rom
-   ```
-   *Esto generará el archivo `gbrom.h` (puede pesar varios megabytes, es normal) que contiene el código en hexadecimal del juego. **Asegúrate de que la variable final sea exactamente `gb_rom`**.*
+#### 1. Preparar las ROMs
+1. Navega a la carpeta `Emulador_Gameboy`.
+2. Crea una carpeta llamada `data` en el interior (si no existe) y copia ahí todas tus ROMs de Gameboy Clásica (extensión `.gb`).
+   *(Nota: Este emulador solo es compatible con juegos de Gameboy clásica, no emula la Gameboy Color).*
 
-#### 2. Compilar y Flashear
-Debido a que la ROM del juego se incrusta directamente en el código del programa, el tamaño superará la partición por defecto del ESP32. **Es obligatorio cambiar el esquema de particiones a "Huge APP (3MB No OTA)"**.
+#### 2. Compilar, Flashear y Subir Juegos
+Hemos automatizado el proceso con un script para flashear el código, el sistema de particiones y los propios juegos empaquetados en LittleFS.
 
-**Opción A: Desde el IDE de Arduino**
-1. Abre `esp32-gameboy/esp32-gameboy.ino`.
-2. En el menú, ve a `Herramientas` -> `Partition Scheme` y selecciona **Huge APP (3MB No OTA/1MB SPIFFS)**.
-3. Asegúrate de tener instalada la librería **GFX Library for Arduino** (probado con v1.6.6) desde el Gestor de Librerías.
-4. Dale a Subir.
-
-**Opción B: Desde línea de comandos (`arduino-cli`)**
+**Desde línea de comandos (Recomendado):**
+Ejecuta el script proporcionado indicando el puerto de tu placa (por defecto `/dev/ttyUSB0`):
 ```bash
-arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=huge_app Emulador_Gameboy.ino
-arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32:PartitionScheme=huge_app Emulador_Gameboy.ino
+cd Emulador_Gameboy
+chmod +x upload.sh
+./upload.sh /dev/ttyUSB0
 ```
+*Este script compila el emulador con el esquema de particiones custom, lo flashea, empaqueta la carpeta `data` usando `mklittlefs` y la sube al ESP32 vía `esptool`.*
+
+> **Nota para contribuidores/clonadores:** El script `upload.sh` está preparado para repositorios genéricos. Busca automáticamente las rutas de `mklittlefs` y `esptool.py` en las carpetas de instalación estándar de Arduino (Linux/macOS) o en tu PATH global. No necesitas editar las rutas del script.
+
+**Desde el IDE de Arduino:**
+1. Abre `Emulador_Gameboy.ino`.
+2. En `Herramientas` -> `Partition Scheme`, selecciona **Custom Partition Scheme (CSV)**.
+3. Sube el sketch dándole al botón normal de subir.
+4. Para subir los juegos, usa la herramienta **ESP32 LittleFS Data Upload** del IDE.
 
 #### 3. Controles en la Badge
-Dado que la placa de la RootedCon carece de algunos botones dedicados que tendría una Gameboy real, los controles se han adaptado (orientación: placa boca abajo):
+Dado que la placa de la RootedCon carece de botones dedicados, los controles se han adaptado:
+- **Menú Inicial:** Utiliza la cruceta para navegar por tu lista de ROMs y **B** (acción secundaria) para lanzar el juego.
 - **Cruceta (D-Pad)**: Mapeada a los botones direccionales de la placa.
-- **A / B**: Mapeados a los pulsadores de acción disponibles.
-- **Start / Select**: Como faltan botones físicos en la placa, usa estas combinaciones:
+- **A / B**: Mapeados a los pulsadores de acción.
+- **Start / Select virtuales**: 
   - Presiona a la vez **A + B + UP (Arriba)** para pulsar *Start*.
   - Presiona a la vez **A + B + DOWN (Abajo)** para pulsar *Select*.
-- **Rotar Pantalla (Modo Demo / Jugar)**: Puedes girar la pantalla 180 grados en cualquier momento (ideal para llevar la placa colgando del cuello y luego girarla para jugar). Solo tienes que **mantener pulsados a la vez los botones Izquierda + Derecha + A + B durante 3 segundos**.
+- **Rotar Pantalla**: Puedes girar la pantalla 180 grados (ideal para llevar la placa colgada). Mantén pulsados **Izquierda + Derecha + A + B durante 3 segundos**.
 
 ### Flasheo de Marauder
 Utiliza el script documentado en `flash_marauder.txt` o mediante `arduino-cli`:

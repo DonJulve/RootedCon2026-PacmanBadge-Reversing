@@ -8,4 +8,8 @@ void sdl_quit(void);
 uint8_t *sdl_get_framebuffer(void);
 unsigned int sdl_get_buttons(void);
 unsigned int sdl_get_directions(void);
+void sdl_start_draw_task(void);
+bool sdl_read_button(int button_id);
+
+extern class Arduino_GFX *tft;
 #endif

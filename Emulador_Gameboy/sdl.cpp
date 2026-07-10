@@ -88,6 +88,9 @@ void sdl_init(void) {
     // uncomment to use builtin pullup resistors
     gpio_set_pull_mode(pin, GPIO_PULLUP_ONLY);
   }
+}
+
+void sdl_start_draw_task(void) {
   xTaskCreatePinnedToCore(draw_task,  /* Function to implement the task */
                           "drawTask", /* Name of the task */
                           10000,      /* Stack size in words */
@@ -95,6 +98,19 @@ void sdl_init(void) {
                           0,          /* Priority of the task */
                           &draw_task_handle, /* Task handle. */
                           0); /* Core where the task should run */
+}
+
+// button_id mapping: 0=Up, 1=Down, 2=Left, 3=Right, 4=A, 5=B
+bool sdl_read_button(int button_id) {
+  switch(button_id) {
+    case 0: return !gpio_get_level(_up);
+    case 1: return !gpio_get_level(_down);
+    case 2: return !gpio_get_level(_left);
+    case 3: return !gpio_get_level(_right);
+    case 4: return !gpio_get_level(_a);
+    case 5: return !gpio_get_level(_b);
+  }
+  return false;
 }
 
 int sdl_update(void) {
