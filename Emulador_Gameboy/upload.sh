@@ -50,7 +50,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "5. Subiendo los juegos (LittleFS) al ESP32 por el puerto $PORT en la dirección 0x150000..."
-$ESPTOOL --chip esp32 --port $PORT --baud 921600 write_flash 0x150000 littlefs.bin
+$ESPTOOL --chip esp32 --port $PORT --baud 921600 write-flash 0x150000 littlefs.bin
 if [ $? -ne 0 ]; then
     echo "Error al subir los juegos. Verifica el puerto."
     exit 1
