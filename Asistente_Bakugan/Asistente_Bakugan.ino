@@ -531,8 +531,8 @@ void drawPlayer(int pIdx) {
     for (int i=0; i<3; i++) {
       int x = 60 + i*16;
       bool won = (i < p.gateCardsWon); 
-      if (won) tft.fillCircle(x+5, 93, 5, TFT_YELLOW);
-      else tft.drawCircle(x+5, 93, 5, TFT_DARKGREY);
+      if (won) tft.fillRect(x, 86, 10, 14, TFT_YELLOW);
+      else tft.drawRect(x, 86, 10, 14, TFT_DARKGREY);
     }
     if (p.cursor == 1) tft.drawRect(56, 85, 52, 16, TFT_GREEN); 
 
