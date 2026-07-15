@@ -25,6 +25,13 @@ Controlador para el evento de pelea de robots de la RootedCon.
 - Utiliza la badge como un mando a distancia por WiFi UDP para controlar los motores y servos.
 - Código fuente disponible en la carpeta `Mando robot`.
 
+### Asistente Bakugan
+Un avanzado asistente de combate interactivo para jugar a Bakugan Battle Brawlers en mesa real.
+- **`Asistente_Bakugan.ino`**: Firmware que maneja estados de juego, puntuaciones y el inventario.
+- Soporta configuración individualizada de atributos, con gráficos en tiempo real para Bakugans (esferas) y piezas de soporte (Trampas como Arañas, Armamentos como Espada/Escudo y Vehículos como Tanques).
+- Incluye animaciones personalizadas (Logo oficial y Rueda de atributos) procesadas desde Python al ESP32 mediante el script `conversor_imagenes.py`.
+- Cuenta con un binario pre-compilado unificado (`Asistente_Bakugan.bin`) listo para flashear.
+
 ### Emulador Gameboy
 Port completo de un emulador de Gameboy para el hardware específico de la RootedCon. Incorpora un **menú multijuegos impulsado por LittleFS** y carga ultrarrápida mediante **Memory Mapping** nativo.
 - Basado en el excelente proyecto [esp32-gameboy](https://github.com/lualiliu/esp32-gameboy) de **lualiliu**.
@@ -81,6 +88,33 @@ Para controlar un robot en la pelea de robots del evento, es necesario configura
 3. Cambia el `ssid` y `password` por las credenciales WiFi específicas de tu robot.
 4. Flashea el código a tu badge. Utiliza los botones direccionales para moverte y los botones Start/Select virtuales para las acciones del servo.
 
+### Asistente Bakugan
+Para flashear el asistente de combate a la badge, necesitas el esquema de partición extendido debido a las altas resoluciones de las imágenes incluidas (Logo y Rueda de Atributos).
+1. Sitúate en el directorio `Asistente_Bakugan`.
+2. *(Opcional)* Si cambias las imágenes (`logo.png` o `wheel.png`), ejecuta antes `python3 conversor_imagenes.py` para regenerar las cabeceras `.h`.
+3. Flashea el código a la placa indicando el particionado `huge_app`:
+   ```bash
+   arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=huge_app Asistente_Bakugan.ino
+   
+   arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32:PartitionScheme=huge_app Asistente_Bakugan.ino
+   ```
+   **Alternativa rápida (Binario pre-compilado):**
+   Si prefieres no compilar, puedes flashear directamente el binario unificado con `esptool.py`:
+   ```bash
+   esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 921600 write_flash 0x0 Asistente_Bakugan.bin
+   ```
+4. **Controles en partida:**
+   - **Cruceta (Fase de Setup):** 
+     - **Arriba / Abajo:** Cambia el Atributo (color) del Bakugan o pieza de soporte.
+     - **Izquierda / Derecha:** Selecciona la forma geométrica para la pieza de soporte (Trampa, Armamento, Vehículo).
+   - **Cruceta (En partida):**
+     - **Izquierda / Derecha:** Mueve el cursor a través de los 14 objetos de tu inventario.
+     - **Arriba / Abajo:** *Abajo* gasta el objeto seleccionado (lo apaga). *Arriba* lo recupera.
+   - **Botón A:** Confirma tu selección en el Setup inicial y alterna entre la pantalla de **"Yo"** y **"Rival"** durante el combate.
+   - **Botón B:** 
+     - **Pulsación leve:** Pone a 0 el Poder G (ideal para empezar una nueva ronda dentro de la misma partida).
+     - **Mantener 2 segundos:** Hace un **Soft-Reset** (reinicia la partida y recupera todo el inventario al instante para empezar una revancha sin volver a elegir colores). Para reconfigurar atributos desde 0, apaga y enciende la placa físicamente.
+
 ### Emulador de Gameboy
 Para jugar a juegos de Gameboy en la placa, sigue estos pasos detallados:
 
@@ -123,6 +157,7 @@ Dado que la placa de la RootedCon carece de botones dedicados, los controles se 
 Utiliza el script documentado en `flash_marauder.txt` o mediante `arduino-cli`:
 ```bash
 arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=huge_app Descargas.ino
+
 arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32:PartitionScheme=huge_app Descargas.ino
 ```
 
