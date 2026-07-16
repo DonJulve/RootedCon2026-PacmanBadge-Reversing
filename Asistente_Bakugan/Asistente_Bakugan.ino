@@ -2,6 +2,8 @@
 #include <Bounce2.h>
 #include "logo.h"
 #include "wheel.h"
+#include "attr_small.h"
+#include "attr_large.h"
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -73,7 +75,7 @@ bool isHoldingDown = false;
 
 void drawSetup();
 void drawPlayer(int pIdx);
-void drawIcon(int x, int y, int type, uint16_t color, bool available, bool highlight);
+void drawIcon(int x, int y, int type, uint16_t color, int attrIdx, bool available, bool highlight);
 
 void setup() {
   Serial.begin(115200);
@@ -371,7 +373,8 @@ void drawSetup() {
      tft.setTextColor(TFT_WHITE, TFT_BLACK);
      tft.drawString(typeName, 64, 110, 2);
   } else {
-     tft.fillCircle(64, 80, 20, color);
+     tft.setSwapBytes(true);
+     tft.pushImage(44, 60, 40, 40, attr_large_images[players[pIdx].attributeIdx[bIdx]]);
   }
   
   tft.setTextColor(color, TFT_BLACK);
@@ -472,15 +475,22 @@ void drawTank(int cx, int cy, int r, uint16_t color, bool filled) {
   }
 }
 
-void drawIcon(int x, int y, int type, uint16_t color, bool available, bool highlight) {
+void drawIcon(int x, int y, int type, uint16_t color, int attrIdx, bool available, bool highlight) {
   if (highlight) {
     tft.drawRect(x-2, y-8, 14, 18, TFT_GREEN);
   }
   if (type == 0) { // Rectángulo
     if (available) tft.fillRect(x, y-6, 10, 14, color);
     else tft.drawRect(x, y-6, 10, 14, TFT_DARKGREY);
-  } else if (type == 1) { // Círculo
-    if (available) tft.fillCircle(x+5, y, 5, color);
+  } else if (type == 1) { // Imagen Bakugan
+    if (available) {
+      tft.setSwapBytes(true);
+      if (attrIdx >= 0 && attrIdx <= 5) {
+        tft.pushImage(x, y-5, 10, 10, attr_small_images[attrIdx]);
+      } else {
+        tft.fillCircle(x+5, y, 5, color);
+      }
+    }
     else tft.drawCircle(x+5, y, 5, TFT_DARKGREY);
   } else if (type == 2) { // Trampa (Araña)
     drawSpider(x+5, y, 5, available ? color : TFT_DARKGREY, available);
@@ -539,24 +549,24 @@ void drawPlayer(int pIdx) {
     // Fila 2: Cartas Portal -> Cursor 2, 3, 4
     tft.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
     tft.drawString("Portal:", 2, 105, 2);
-    drawIcon(60, 113, 0, COLOR_GOLD,   p.gateCards[0], p.cursor == 2);
-    drawIcon(76, 113, 0, COLOR_SILVER, p.gateCards[1], p.cursor == 3);
-    drawIcon(92, 113, 0, COLOR_BRONZE, p.gateCards[2], p.cursor == 4);
+    drawIcon(60, 113, 0, COLOR_GOLD, -1, p.gateCards[0], p.cursor == 2);
+    drawIcon(76, 113, 0, COLOR_SILVER, -1, p.gateCards[1], p.cursor == 3);
+    drawIcon(92, 113, 0, COLOR_BRONZE, -1, p.gateCards[2], p.cursor == 4);
 
     // Fila 3: Bakugans -> Cursor 5, 6, 7
     tft.drawString("Bakugan:", 2, 125, 2);
-    drawIcon(60, 133, 1, attributes[p.attributeIdx[0]], p.bakugans[0], p.cursor == 5);
-    drawIcon(76, 133, 1, attributes[p.attributeIdx[1]], p.bakugans[1], p.cursor == 6);
-    drawIcon(92, 133, 1, attributes[p.attributeIdx[2]], p.bakugans[2], p.cursor == 7);
+    drawIcon(60, 133, 1, attributes[p.attributeIdx[0]], p.attributeIdx[0], p.bakugans[0], p.cursor == 5);
+    drawIcon(76, 133, 1, attributes[p.attributeIdx[1]], p.attributeIdx[1], p.bakugans[1], p.cursor == 6);
+    drawIcon(92, 133, 1, attributes[p.attributeIdx[2]], p.attributeIdx[2], p.bakugans[2], p.cursor == 7);
 
     // Fila 4: Poder + Soporte -> Cursor 8,9,10 y 11,12
     tft.drawString("Mano:", 2, 145, 2);
-    drawIcon(45, 153, 0, TFT_RED,   p.abilities[0], p.cursor == 8);
-    drawIcon(60, 153, 0, TFT_GREEN, p.abilities[1], p.cursor == 9);
-    drawIcon(75, 153, 0, TFT_BLUE,  p.abilities[2], p.cursor == 10);
+    drawIcon(45, 153, 0, TFT_RED, -1, p.abilities[0], p.cursor == 8);
+    drawIcon(60, 153, 0, TFT_GREEN, -1, p.abilities[1], p.cursor == 9);
+    drawIcon(75, 153, 0, TFT_BLUE, -1, p.abilities[2], p.cursor == 10);
     
-    drawIcon(95, 153, p.supportTypes[0] + 2, attributes[p.supportAttrs[0]], p.supports[0], p.cursor == 11);
-    drawIcon(110, 153, p.supportTypes[1] + 2, attributes[p.supportAttrs[1]], p.supports[1], p.cursor == 12);
+    drawIcon(95, 153, p.supportTypes[0] + 2, attributes[p.supportAttrs[0]], p.supportAttrs[0], p.supports[0], p.cursor == 11);
+    drawIcon(110, 153, p.supportTypes[1] + 2, attributes[p.supportAttrs[1]], p.supportAttrs[1], p.supports[1], p.cursor == 12);
   }
 
   // Poder G
